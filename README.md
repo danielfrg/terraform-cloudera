@@ -39,6 +39,13 @@ Follow the multiple prompts and on `Specify hosts for your CDH cluster installat
 and all your nodes should already be connected.
 
 ## Notes
+
+You might need to add this to you ssh client config (`~/.ssh/config`) if the bootstrap fails for centos:
+```
+Host *
+    ServerAliveInterval 600
+```
+
 The installation script are based on the
 [Installation Path B - Installation Using Cloudera Manager Parcels or Packages](https://www.cloudera.com/documentation/enterprise/5-9-x/topics/cm_ig_install_path_b.html)
 documentation
