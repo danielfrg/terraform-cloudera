@@ -1,3 +1,18 @@
+variable "servers" {
+  default     = "3"
+  description = "The number of Cloudera managed servers to launch"
+}
+
+variable "region" {
+  default     = "us-east-1"
+  description = "The region of AWS, for AMI lookups."
+}
+
+variable "group_name" {
+  default     = "terraform-cloudera"
+  description = "Placement group"
+}
+
 variable "platform" {
   default     = "ubuntu1404"
   description = "The OS Platform"
@@ -36,22 +51,27 @@ variable "key_path" {
   description = "Path to the private key specified by key_name."
 }
 
-variable "region" {
-  default     = "us-east-1"
-  description = "The region of AWS, for AMI lookups."
-}
-
-variable "servers" {
-  default     = "3"
-  description = "The number of Cloudera managed servers to launch."
-}
-
 variable "instance_type" {
   default     = "m4.large"
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
 }
 
 variable "tagName" {
-  default     = "cloudera"
+  default     = "terraform-cloudera"
   description = "Name tag for the servers"
+}
+
+variable "volume_type" {
+  default     = "standard"
+  description = "Instance type for the"
+}
+
+variable "volume_size" {
+  default     = "200"
+  description = "Volume size of the agent nodes"
+}
+
+variable "iops" {
+  default     = "3000"
+  description = "IOPS for the disk. Only if volume_type is io1"
 }

@@ -1,8 +1,14 @@
+resource "aws_placement_group" "cluster" {
+    name = "${var.group_name}"
+    strategy = "cluster"
+}
+
 resource "aws_instance" "server" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.cloudera.name}"]
+    placement_group = "${aws_placement_group.cluster.id}"
 
     connection {
         user = "${lookup(var.user, var.platform)}"
@@ -21,15 +27,27 @@ resource "aws_instance" "server" {
     }
 
     provisioner "file" {
-       source = "${path.module}/../scripts/${var.platform}/server.sh"
-       destination = "/tmp/server.sh"
+        source = "${path.module}/../scripts/${var.platform}/server.sh"
+        destination = "/tmp/server.sh"
     }
 
     provisioner "remote-exec" {
-       inline = [
-        "chmod +x /tmp/server.sh",
-        "/tmp/server.sh ${count.index}",
-       ]
+        inline = [
+            "chmod +x /tmp/server.sh",
+            "/tmp/server.sh ${count.index}",
+        ]
+    }
+
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/agent.sh",
+        destination = "/tmp/agent.sh"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+          "chmod +x /tmp/agent.sh",
+          "/tmp/agent.sh ${aws_instance.server.private_ip}",
+        ]
     }
 }
 
@@ -39,6 +57,13 @@ resource "aws_instance" "agent" {
     key_name = "${var.key_name}"
     count = "${var.servers - 1}"
     security_groups = ["${aws_security_group.cloudera.name}"]
+    placement_group = "${aws_placement_group.cluster.id}"
+
+    root_block_device {
+        volume_type = "${var.volume_type}"
+        volume_size = "${var.volume_size}"
+        iops = "${var.iops}"
+    }
 
     connection {
         user = "${lookup(var.user, var.platform)}"
@@ -57,20 +82,20 @@ resource "aws_instance" "agent" {
     }
 
     provisioner "file" {
-       source = "${path.module}/../scripts/${var.platform}/agent.sh",
-       destination = "/tmp/agent.sh"
+        source = "${path.module}/../scripts/${var.platform}/agent.sh",
+        destination = "/tmp/agent.sh"
     }
 
     provisioner "remote-exec" {
-       inline = [
-        "chmod +x /tmp/agent.sh",
-        "/tmp/agent.sh ${aws_instance.server.private_ip}",
-       ]
+        inline = [
+          "chmod +x /tmp/agent.sh",
+          "/tmp/agent.sh ${aws_instance.server.private_ip}",
+        ]
     }
 }
 
 resource "aws_security_group" "cloudera" {
-    name = "cloudera_terraform"
+    name = "terraform_cloudera"
     description = "Cloudera outside traffic (all open) + maintenance"
 
     // These are for internal and external traffic
