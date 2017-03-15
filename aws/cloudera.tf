@@ -10,6 +10,12 @@ resource "aws_instance" "server" {
     security_groups = ["${aws_security_group.cloudera.name}"]
     placement_group = "${aws_placement_group.cluster.id}"
 
+    root_block_device {
+        volume_type = "${var.volume_type}"
+        volume_size = "${var.volume_size}"
+        iops = "${var.iops}"
+    }
+
     connection {
         user = "${lookup(var.user, var.platform)}"
         private_key = "${file("${var.key_path}")}"

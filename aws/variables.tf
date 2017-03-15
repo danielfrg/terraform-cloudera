@@ -62,8 +62,8 @@ variable "tagName" {
 }
 
 variable "volume_type" {
-  default     = "standard"
-  description = "Instance type for the"
+  default     = "io1"
+  description = "The type of volume. Can be 'standard', 'gp2', or 'io1'"
 }
 
 variable "volume_size" {
