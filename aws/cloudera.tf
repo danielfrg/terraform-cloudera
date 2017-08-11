@@ -14,6 +14,7 @@ resource "aws_instance" "server" {
         volume_type = "${var.volume_type}"
         volume_size = "${var.volume_size}"
         iops = "${var.iops}"
+        delete_on_termination = true
     }
 
     connection {
@@ -22,6 +23,10 @@ resource "aws_instance" "server" {
     }
 
     tags {
+        Name = "${var.tagName}-server"
+    }
+
+    volume_tags {
         Name = "${var.tagName}-server"
     }
 
@@ -77,6 +82,10 @@ resource "aws_instance" "agent" {
     }
 
     tags {
+        Name = "${var.tagName}-agent-${count.index}"
+    }
+
+    volume_tags {
         Name = "${var.tagName}-agent-${count.index}"
     }
 
