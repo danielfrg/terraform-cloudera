@@ -34,9 +34,6 @@ variable "ami" {
     us-east-2-ubuntu1404      = "ami-b7075dd2"
     us-west-1-ubuntu1404      = "ami-a9a8e4c9"
     us-west-2-ubuntu1404      = "ami-9abea4fb"
-    us-east-1-centos6         = "ami-57cd8732"
-    us-east-2-centos6         = "ami-c299c2a7"
-    us-west-2-centos6         = "ami-1255b321"
     us-east-1-centos7         = "ami-6d1c2007"
     us-east-2-centos7         = "ami-6a2d760f"
     us-west-1-centos7         = "ami-af4333cf"
@@ -72,6 +69,6 @@ variable "volume_size" {
 }
 
 variable "iops" {
-  default     = "3000"
+  default     = "1000"
   description = "IOPS for the disk. Only if volume_type is io1"
 }
