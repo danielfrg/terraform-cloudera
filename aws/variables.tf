@@ -1,27 +1,51 @@
-variable "servers" {
+variable "key_name" {
+  description = "SSH key name in your AWS account for AWS instances."
+}
+
+variable "key_path" {
+  description = "Path to the private key specified by key_name."
+}
+
+# Optional
+
+variable "tag_name" {
+  description = "Prefix for all resources"
+  default     = "cloudera"
+}
+
+variable "cdh_server" {
+  description = "Launch the CDH server (1 to enable - 0 to disable)"
+  default     = "1"
+}
+
+variable "cdh_nodes" {
+  description = "Number of CDH nodes to launch"
   default     = "3"
-  description = "The number of Cloudera managed servers to launch"
+}
+
+variable "dsw_master" {
+  description = "Launch the DSW master (1 to enable - 0 to disable)"
+  default     = "1"
+}
+
+variable "dsw_nodes" {
+  description = "Number DSW nodes to launch"
+  default     = "1"
 }
 
 variable "region" {
-  default     = "us-east-1"
   description = "The region of AWS, for AMI lookups."
-}
-
-variable "group_name" {
-  default     = "terraform-cloudera"
-  description = "Placement group"
+  default     = "us-east-1"
 }
 
 variable "platform" {
-  default     = "ubuntu1404"
-  description = "The OS Platform"
+  description = "The OS Platform (centos7 or ubuntu1404)"
+  default     = "centos7"
 }
 
 variable "user" {
   default = {
     ubuntu1404  = "ubuntu"
-    centos6     = "centos"
     centos7     = "centos"
   }
 }
@@ -40,35 +64,22 @@ variable "ami" {
   }
 }
 
-variable "key_name" {
-  description = "SSH key name in your AWS account for AWS instances."
-}
-
-variable "key_path" {
-  description = "Path to the private key specified by key_name."
-}
-
 variable "instance_type" {
-  default     = "m4.large"
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
-}
-
-variable "tagName" {
-  default     = "terraform-cloudera"
-  description = "Name tag for the servers"
+  default     = "m4.xlarge"
 }
 
 variable "volume_type" {
-  default     = "io1"
   description = "The type of volume. Can be 'standard', 'gp2', or 'io1'"
+  default     = "io1"
 }
 
 variable "volume_size" {
-  default     = "200"
-  description = "Volume size of the agent nodes"
+  description = "Volume size of the CDH nodes"
+  default     = "300"
 }
 
 variable "iops" {
-  default     = "1000"
   description = "IOPS for the disk. Only if volume_type is io1"
+  default     = "1000"
 }

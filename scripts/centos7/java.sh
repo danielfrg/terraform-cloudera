@@ -3,4 +3,4 @@
 set -e
 set -x
 
-sudo yum install -y oracle-j2sdk1.7
+sudo yum install -y java-1.7.0-openjdk
