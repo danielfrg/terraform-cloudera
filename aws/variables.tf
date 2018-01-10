@@ -25,12 +25,22 @@ variable "cdh_nodes" {
 
 variable "dsw_master" {
   description = "Launch the DSW master (1 to enable - 0 to disable)"
-  default     = "1"
+  default     = "0"
 }
 
 variable "dsw_nodes" {
   description = "Number DSW nodes to launch"
-  default     = "1"
+  default     = "00"
+}
+
+variable "ambari_server" {
+  description = "Launch the Ambari master (1 to enable - 0 to disable)"
+  default     = "0"
+}
+
+variable "ambari_nodes" {
+  description = "Number Ambari nodes to launch"
+  default     = "0"
 }
 
 variable "region" {

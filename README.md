@@ -12,17 +12,27 @@ Note that the default configuration uses an embedded postgresql database that is
 ```
 module "cloudera" {
     source  = "github.com/danielfrg/terrafor-cloudera/aws"
-
-    platform = "ubuntu1404"
-    key_name = "<AWS keyname>"
-    key_path = "<path to the matching keypair above>"
+    tag_name = "cloudera"
+    platform = "centos7"
+    key_name = "<keypair>"
+    key_path = "~/.ssh/<keypair>.pem"
     region = "us-east-1"
-    servers = "4"
+    instance_type = "c4.2xlarge"
+    cdh_server = "1"
+    cdh_nodes = "3"
+    dsw_master = "1"
+    dsw_nodes = "3"
+    volume_size = "100"
 }
 
-output "server_address" {
-    value = "${module.cloudera.server_address}"
+output "cdh_server_address" {
+    value = "${module.cloudera.cdh_server_address}"
 }
+
+output "dsw_master_address" {
+    value = "${module.cloudera.dsw_master_address}"
+}
+
 ```
 
 ```
@@ -41,6 +51,7 @@ and all your nodes should already be connected.
 ## Notes
 
 You might need to add this to you ssh client config (`~/.ssh/config`) if the bootstrap fails for centos:
+
 ```
 Host *
     ServerAliveInterval 600
@@ -49,3 +60,16 @@ Host *
 The installation script are based on the
 [Installation Path B - Installation Using Cloudera Manager Parcels or Packages](https://www.cloudera.com/documentation/enterprise/5-9-x/topics/cm_ig_install_path_b.html)
 documentation
+
+## Ambari
+
+For ambari right now it sets up the server and you need to keep going from: `ambari-server setup` [docs](https://docs.hortonworks.com/HDPDocuments/Ambari-2.5.2.0/bk_ambari-installation/content/set_up_the_ambari_server.html)
+
+```
+module "cloudera" {
+    ...
+
+    ambari_serve = "1"
+    ambari_nodes = "3"
+}
+```
