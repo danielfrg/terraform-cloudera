@@ -57,6 +57,18 @@ resource "aws_instance" "cdh_server" {
           "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
+
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/kerberos-server.sh",
+        destination = "/tmp/kerberos-server.sh"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+          "chmod +x /tmp/kerberos-server.sh",
+          "/tmp/kerberos-server.sh ${aws_instance.cdh_server.private_ip}",
+        ]
+    }
 }
 
 resource "aws_instance" "cdh_node" {
@@ -102,6 +114,18 @@ resource "aws_instance" "cdh_node" {
         inline = [
           "chmod +x /tmp/agent.sh",
           "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
+        ]
+    }
+
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/kerberos-node.sh",
+        destination = "/tmp/kerberos-node.sh"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+          "chmod +x /tmp/kerberos-node.sh",
+          "/tmp/kerberos-node.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
 }

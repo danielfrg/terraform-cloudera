@@ -30,7 +30,7 @@ variable "dsw_master" {
 
 variable "dsw_nodes" {
   description = "Number DSW nodes to launch"
-  default     = "00"
+  default     = "0"
 }
 
 variable "ambari_server" {
@@ -76,7 +76,7 @@ variable "ami" {
 
 variable "instance_type" {
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
-  default     = "m4.xlarge"
+  default     = "c4.2xlarge"
 }
 
 variable "volume_type" {
@@ -86,10 +86,10 @@ variable "volume_type" {
 
 variable "volume_size" {
   description = "Volume size of the CDH nodes"
-  default     = "300"
+  default     = "500"
 }
 
 variable "iops" {
   description = "IOPS for the disk. Only if volume_type is io1"
-  default     = "1000"
+  default     = "1500"
 }

@@ -48,6 +48,19 @@ Navigate to `<Public IP address>:7180` and login (user: `admin`, pass:`admin`).
 Follow the multiple prompts and on `Specify hosts for your CDH cluster installation` click on `Currently Managed Hosts (X)`
 and all your nodes should already be connected.
 
+### Kerberos
+
+For CDH the kerberos server is installed in the server node and connected from the other nodes.
+
+Two principals are created:
+
+- `centos@ANACONDA.COM` - PW: `centos`
+- `cloudera-scm/admin@ANACONDA.COM` - PW: `cloudera`
+
+After terraform finishes you can ssh into any node and `kinit` as the `centos` user.
+
+Use the `cloudera-scm` user and follow the Cloudera Manager to finish setting up the CDH cluster with Kerberos
+
 ## Notes
 
 You might need to add this to you ssh client config (`~/.ssh/config`) if the bootstrap fails for centos:
