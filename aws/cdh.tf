@@ -1,4 +1,3 @@
-
 resource "aws_instance" "cdh_server" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
     instance_type = "${var.instance_type}"
@@ -34,27 +33,18 @@ resource "aws_instance" "cdh_server" {
         ]
     }
 
-    provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/server.sh"
-        destination = "/tmp/server.sh"
-    }
-
     provisioner "remote-exec" {
-        inline = [
-            "chmod +x /tmp/server.sh",
-            "/tmp/server.sh",
-        ]
+        script = "${path.module}/../scripts/${var.platform}/cdh-server.sh"
     }
 
     provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/agent.sh",
-        destination = "/tmp/agent.sh"
+        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
+        destination = "/tmp/cdh-agent.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
-          "chmod +x /tmp/agent.sh",
-          "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
+          "chmod +x /tmp/cdh-agent.sh",
+          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
 
@@ -62,11 +52,18 @@ resource "aws_instance" "cdh_server" {
         source = "${path.module}/../scripts/${var.platform}/kerberos-server.sh",
         destination = "/tmp/kerberos-server.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
           "chmod +x /tmp/kerberos-server.sh",
           "/tmp/kerberos-server.sh ${aws_instance.cdh_server.private_ip}",
+        ]
+    }
+
+    provisioner "remote-exec" {
+        scripts = [
+            "${path.module}/../scripts/${var.platform}/csd-spark2.sh",
+            "${path.module}/../scripts/${var.platform}/csd-dsw.sh",
+            "${path.module}/../scripts/${var.platform}/restart-cloudera-manager.sh",
         ]
     }
 }
@@ -85,17 +82,17 @@ resource "aws_instance" "cdh_node" {
         iops = "${var.iops}"
     }
 
-    connection {
-        user = "${lookup(var.user, var.platform)}"
-        private_key = "${file("${var.key_path}")}"
-    }
-
     tags {
         Name = "${var.tag_name}-node-${count.index}"
     }
 
     volume_tags {
         Name = "${var.tag_name}-node-${count.index}"
+    }
+
+    connection {
+        user = "${lookup(var.user, var.platform)}"
+        private_key = "${file("${var.key_path}")}"
     }
 
     provisioner "remote-exec" {
@@ -106,14 +103,13 @@ resource "aws_instance" "cdh_node" {
     }
 
     provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/agent.sh",
-        destination = "/tmp/agent.sh"
+        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
+        destination = "/tmp/cdh-agent.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
-          "chmod +x /tmp/agent.sh",
-          "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
+          "chmod +x /tmp/cdh-agent.sh",
+          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
 
@@ -121,7 +117,6 @@ resource "aws_instance" "cdh_node" {
         source = "${path.module}/../scripts/${var.platform}/kerberos-node.sh",
         destination = "/tmp/kerberos-node.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
           "chmod +x /tmp/kerberos-node.sh",

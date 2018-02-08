@@ -1,4 +1,3 @@
-
 resource "aws_instance" "dsw_master" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
     instance_type = "${var.instance_type}"
@@ -7,17 +6,9 @@ resource "aws_instance" "dsw_master" {
     security_groups = ["${aws_security_group.cloudera.name}"]
     placement_group = "${aws_placement_group.cloudera.id}"
 
-    tags {
-        Name = "${var.tag_name}-dsw-master"
-    }
-
-    volume_tags {
-        Name = "${var.tag_name}-dsw-master"
-    }
-
     root_block_device {
       volume_type           = "io1"
-      volume_size           = "50"
+      volume_size           = "100"
       iops                  = 1000
       delete_on_termination = true
     }
@@ -31,13 +22,21 @@ resource "aws_instance" "dsw_master" {
       delete_on_termination = true
     }
 
-    # Master only: App volume
+    # App volume (Master only)
     ebs_block_device = {
       volume_size = "500"
       volume_type = "io1"
       device_name = "/dev/xvdc"
       iops = 1000
       delete_on_termination = true
+    }
+
+    tags {
+        Name = "${var.tag_name}-dsw-master"
+    }
+
+    volume_tags {
+        Name = "${var.tag_name}-dsw-master"
     }
 
     connection {
@@ -52,25 +51,39 @@ resource "aws_instance" "dsw_master" {
         ]
     }
 
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
+        destination = "/tmp/cdh-agent.sh"
+    }
     provisioner "remote-exec" {
-        scripts = [
-            "${path.module}/../scripts/${var.platform}/dsw.sh",
+        inline = [
+          "chmod +x /tmp/cdh-agent.sh",
+          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
 
     provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/agent.sh",
-        destination = "/tmp/agent.sh"
+        source = "${path.module}/../scripts/${var.platform}/kerberos-node.sh",
+        destination = "/tmp/kerberos-node.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
-          "chmod +x /tmp/agent.sh",
-          "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
+          "chmod +x /tmp/kerberos-node.sh",
+          "/tmp/kerberos-node.sh ${aws_instance.cdh_server.private_ip}",
+        ]
+    }
+
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/cdsw.sh",
+        destination = "/tmp/cdsw.sh"
+    }
+    provisioner "remote-exec" {
+        inline = [
+          "chmod +x /tmp/cdsw.sh",
+          "/tmp/cdsw.sh ${aws_instance.dsw_master.private_ip} ${var.dsw_domain}",
         ]
     }
 }
-
 
 resource "aws_instance" "dsw_node" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
@@ -80,17 +93,9 @@ resource "aws_instance" "dsw_node" {
     security_groups = ["${aws_security_group.cloudera.name}"]
     placement_group = "${aws_placement_group.cloudera.id}"
 
-    tags {
-        Name = "${var.tag_name}-dsw-node-${count.index}"
-    }
-
-    volume_tags {
-        Name = "${var.tag_name}-dsw-node-${count.index}"
-    }
-
     root_block_device {
       volume_type           = "io1"
-      volume_size           = "50"
+      volume_size           = "100"
       iops                  = 1000
       delete_on_termination = true
     }
@@ -102,6 +107,14 @@ resource "aws_instance" "dsw_node" {
       device_name           = "/dev/xvdb"
       iops                  = 1000
       delete_on_termination = true
+    }
+
+    tags {
+        Name = "${var.tag_name}-dsw-node-${count.index}"
+    }
+
+    volume_tags {
+        Name = "${var.tag_name}-dsw-node-${count.index}"
     }
 
     connection {
@@ -116,21 +129,36 @@ resource "aws_instance" "dsw_node" {
         ]
     }
 
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
+        destination = "/tmp/cdh-agent.sh"
+    }
     provisioner "remote-exec" {
-        scripts = [
-            "${path.module}/../scripts/${var.platform}/dsw.sh",
+        inline = [
+          "chmod +x /tmp/cdh-agent.sh",
+          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
         ]
     }
 
     provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/agent.sh",
-        destination = "/tmp/agent.sh"
+        source = "${path.module}/../scripts/${var.platform}/kerberos-node.sh",
+        destination = "/tmp/kerberos-node.sh"
     }
-
     provisioner "remote-exec" {
         inline = [
-          "chmod +x /tmp/agent.sh",
-          "/tmp/agent.sh ${aws_instance.cdh_server.private_ip}",
+          "chmod +x /tmp/kerberos-node.sh",
+          "/tmp/kerberos-node.sh ${aws_instance.cdh_server.private_ip}",
+        ]
+    }
+
+    provisioner "file" {
+        source = "${path.module}/../scripts/${var.platform}/cdsw.sh",
+        destination = "/tmp/cdsw.sh"
+    }
+    provisioner "remote-exec" {
+        inline = [
+          "chmod +x /tmp/cdsw.sh",
+          "/tmp/cdsw.sh ${aws_instance.dsw_master.private_ip} ${var.dsw_domain}",
         ]
     }
 }

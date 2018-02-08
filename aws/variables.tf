@@ -33,6 +33,11 @@ variable "dsw_nodes" {
   default     = "0"
 }
 
+variable "dsw_domain" {
+  description = "Domain used for dsw"
+  default     = "demo.cloudera.com"
+}
+
 variable "ambari_server" {
   description = "Launch the Ambari master (1 to enable - 0 to disable)"
   default     = "0"
@@ -64,13 +69,14 @@ variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types"
 
   default = {
+    us-east-1-centos7         = "ami-4bf3d731"
+    us-east-2-centos7         = "ami-e1496384"
+    us-west-1-centos7         = "ami-65e0e305"
+    us-west-2-centos7         = "ami-a042f4d8"
     us-east-1-ubuntu1404      = "ami-fce3c696"
     us-east-2-ubuntu1404      = "ami-b7075dd2"
     us-west-1-ubuntu1404      = "ami-a9a8e4c9"
     us-west-2-ubuntu1404      = "ami-9abea4fb"
-    us-east-1-centos7         = "ami-6d1c2007"
-    us-east-2-centos7         = "ami-6a2d760f"
-    us-west-1-centos7         = "ami-af4333cf"
   }
 }
 

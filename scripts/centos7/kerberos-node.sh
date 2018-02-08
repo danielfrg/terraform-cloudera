@@ -12,8 +12,6 @@ KERBEROS_ADMIN_SERVER=$CDH_SERVER_PRIVATE_DNS
 # copy paste from that if updating keeping the varibles at the above
 ##########
 
-sudo hostname $(hostname)".ec2.internal"
-
 sudo yum install -y openldap-clients krb5-server krb5-workstation krb5-libs
 
 sudo bash -c 'cat > /etc/krb5.conf' << EOF

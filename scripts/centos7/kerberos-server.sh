@@ -3,12 +3,12 @@
 set -e
 set -x
 
-KERBEROS_HOST_ADDRESS=$(hostname)".ec2.internal"
+KERBEROS_HOST_ADDRESS=$(hostname)
 
 # Kerberos principals are tightly bound to hostname and resolved DNS
-# On EC2 hostname does not match the resolved DNS
+# On EC2 hostname (some instances) does not match the resolved DNS
 # This do not persist through restarts. Change /etc/hostname and reboot for that.
-sudo hostname $(hostname)".ec2.internal"
+# sudo hostname $(hostname)".ec2.internal"
 
 sudo yum install -y openldap-clients krb5-server krb5-workstation krb5-libs
 
