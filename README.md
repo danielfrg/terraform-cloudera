@@ -120,7 +120,11 @@ Two principals are created:
 
 After terraform finishes you can ssh into any node and `kinit` as the `centos` user.
 
-Use the `cloudera-scm` user (pass: `cloudera`) and follow the Cloudera Manager to finish setting up the CDH cluster with Kerberos.
+On Cloudera Manager:
+- Security > Enable Kerberos.
+  - Follow the Cloudera Manager to finish setting up the CDH cluster with Kerberos.
+- `KDC Server host` and `KDC Admin server host` is the internal ip of the CDH server.
+- Use the `cloudera-scm/admin` principal (pass: `cloudera`) and 
 
 ## Ambari
 
