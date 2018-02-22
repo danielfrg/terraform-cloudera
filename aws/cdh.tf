@@ -83,11 +83,11 @@ resource "aws_instance" "cdh_node" {
     }
 
     tags {
-        Name = "${var.tag_name}-node-${count.index}"
+        Name = "${var.tag_name}-cdh-node-${count.index}"
     }
 
     volume_tags {
-        Name = "${var.tag_name}-node-${count.index}"
+        Name = "${var.tag_name}-cdh-node-${count.index}"
     }
 
     connection {
