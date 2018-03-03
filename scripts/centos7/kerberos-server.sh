@@ -82,6 +82,8 @@ sudo kdb5_util -P anaconda create -s
 sudo service krb5kdc start
 sudo service kadmin start
 
-# Create cloudera-scm/admin principal - password: cloudera
+# Principals for some users
+sudo kadmin.local addprinc -pw hdfs hdfs@ANACONDA.COM
 sudo kadmin.local addprinc -pw centos centos@ANACONDA.COM
+# Create cloudera-scm/admin principal - password: cloudera
 sudo kadmin.local addprinc -pw cloudera cloudera-scm/admin@ANACONDA.COM

@@ -30,6 +30,7 @@ resource "aws_instance" "cdh_server" {
         scripts = [
             "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
             "${path.module}/../scripts/${var.platform}/java.sh",
+            "${path.module}/../scripts/${var.platform}/livy.sh",
         ]
     }
 
