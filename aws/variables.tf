@@ -23,6 +23,11 @@ variable "cdh_nodes" {
   default     = "3"
 }
 
+variable "client" {
+  description = "Launch a client node (1 to enable - 0 to disable)"
+  default     = "0"
+}
+
 variable "dsw_master" {
   description = "Launch the DSW master (1 to enable - 0 to disable)"
   default     = "0"
@@ -60,8 +65,8 @@ variable "platform" {
 
 variable "user" {
   default = {
-    ubuntu1404  = "ubuntu"
-    centos7     = "centos"
+    ubuntu1404 = "ubuntu"
+    centos7    = "centos"
   }
 }
 
@@ -69,14 +74,10 @@ variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types"
 
   default = {
-    us-east-1-centos7         = "ami-4bf3d731"
-    us-east-2-centos7         = "ami-e1496384"
-    us-west-1-centos7         = "ami-65e0e305"
-    us-west-2-centos7         = "ami-a042f4d8"
-    us-east-1-ubuntu1404      = "ami-fce3c696"
-    us-east-2-ubuntu1404      = "ami-b7075dd2"
-    us-west-1-ubuntu1404      = "ami-a9a8e4c9"
-    us-west-2-ubuntu1404      = "ami-9abea4fb"
+    us-east-1-centos7 = "ami-4bf3d731"
+    us-east-2-centos7 = "ami-e1496384"
+    us-west-1-centos7 = "ami-65e0e305"
+    us-west-2-centos7 = "ami-a042f4d8"
   }
 }
 
@@ -97,5 +98,5 @@ variable "volume_size" {
 
 variable "iops" {
   description = "IOPS for the disk. Only if volume_type is io1"
-  default     = "1500"
+  default     = "1000"
 }

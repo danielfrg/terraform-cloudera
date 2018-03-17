@@ -30,7 +30,6 @@ includedir /etc/krb5.conf.d/
  forwardable = true
  rdns = false
  default_realm = ANACONDA.COM
- default_ccache_name = KEYRING:persistent:%{uid}
 
 [realms]
  ANACONDA.COM = {

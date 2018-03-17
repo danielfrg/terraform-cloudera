@@ -33,7 +33,6 @@ includedir /etc/krb5.conf.d/
  forwardable = true
  rdns = false
  default_realm = ANACONDA.COM
- default_ccache_name = KEYRING:persistent:%{uid}
 
 [realms]
  ANACONDA.COM = {
@@ -82,8 +81,12 @@ sudo kdb5_util -P anaconda create -s
 sudo service krb5kdc start
 sudo service kadmin start
 
+# Create cloudera-scm/admin principal - password: cloudera-scm
+sudo kadmin.local addprinc -pw cloudera-scm cloudera-scm/admin@ANACONDA.COM
 # Principals for some users
 sudo kadmin.local addprinc -pw hdfs hdfs@ANACONDA.COM
 sudo kadmin.local addprinc -pw centos centos@ANACONDA.COM
-# Create cloudera-scm/admin principal - password: cloudera
-sudo kadmin.local addprinc -pw cloudera cloudera-scm/admin@ANACONDA.COM
+sudo kadmin.local addprinc -pw daniel daniel@ANACONDA.COM
+sudo kadmin.local addprinc -pw christine christine@ANACONDA.COM
+sudo kadmin.local addprinc -pw kris kris@ANACONDA.COM
+sudo kadmin.local addprinc -pw ben ben@ANACONDA.COM

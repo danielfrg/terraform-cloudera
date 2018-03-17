@@ -1,127 +1,133 @@
 resource "aws_instance" "cdh_server" {
-    ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
-    instance_type = "${var.instance_type}"
-    key_name = "${var.key_name}"
-    count = "${var.cdh_server}"
-    security_groups = ["${aws_security_group.cloudera.name}"]
-    placement_group = "${aws_placement_group.cloudera.id}"
+  ami             = "${lookup(var.ami, "${var.region}-${var.platform}")}"
+  instance_type   = "${var.instance_type}"
+  key_name        = "${var.key_name}"
+  count           = "${var.cdh_server}"
+  security_groups = ["${aws_security_group.cloudera.name}"]
+  placement_group = "${aws_placement_group.cloudera.id}"
 
-    root_block_device {
-        volume_type = "${var.volume_type}"
-        volume_size = "${var.volume_size}"
-        iops = "${var.iops}"
-        delete_on_termination = true
-    }
+  root_block_device {
+    volume_type           = "${var.volume_type}"
+    volume_size           = "${var.volume_size}"
+    iops                  = "${var.iops}"
+    delete_on_termination = true
+  }
 
-    tags {
-        Name = "${var.tag_name}-cdh-server"
-    }
+  tags {
+    Name = "${var.tag_name}-cdh-server"
+  }
 
-    volume_tags {
-        Name = "${var.tag_name}-cdh-server"
-    }
+  volume_tags {
+    Name = "${var.tag_name}-cdh-server"
+  }
 
-    connection {
-        user = "${lookup(var.user, var.platform)}"
-        private_key = "${file("${var.key_path}")}"
-    }
+  connection {
+    user        = "${lookup(var.user, var.platform)}"
+    private_key = "${file("${var.key_path}")}"
+  }
 
-    provisioner "remote-exec" {
-        scripts = [
-            "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
-            "${path.module}/../scripts/${var.platform}/java.sh",
-            "${path.module}/../scripts/${var.platform}/livy.sh",
-        ]
-    }
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/../scripts/${var.platform}/base.sh",
+      "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
+      "${path.module}/../scripts/${var.platform}/java.sh",
+      "${path.module}/../scripts/${var.platform}/livy.sh",
+    ]
+  }
 
-    provisioner "remote-exec" {
-        script = "${path.module}/../scripts/${var.platform}/cdh-server.sh"
-    }
+  provisioner "remote-exec" {
+    script = "${path.module}/../scripts/${var.platform}/cdh-server.sh"
+  }
 
-    provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
-        destination = "/tmp/cdh-agent.sh"
-    }
-    provisioner "remote-exec" {
-        inline = [
-          "chmod +x /tmp/cdh-agent.sh",
-          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
-        ]
-    }
+  provisioner "file" {
+    source      = "${path.module}/../scripts/${var.platform}/cdh-agent.sh"
+    destination = "/tmp/cdh-agent.sh"
+  }
 
-    provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/kerberos-server.sh",
-        destination = "/tmp/kerberos-server.sh"
-    }
-    provisioner "remote-exec" {
-        inline = [
-          "chmod +x /tmp/kerberos-server.sh",
-          "/tmp/kerberos-server.sh ${aws_instance.cdh_server.private_ip}",
-        ]
-    }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/cdh-agent.sh",
+      "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
+    ]
+  }
 
-    provisioner "remote-exec" {
-        scripts = [
-            "${path.module}/../scripts/${var.platform}/csd-spark2.sh",
-            "${path.module}/../scripts/${var.platform}/csd-dsw.sh",
-            "${path.module}/../scripts/${var.platform}/restart-cloudera-manager.sh",
-        ]
-    }
+  provisioner "file" {
+    source      = "${path.module}/../scripts/${var.platform}/kerberos-server.sh"
+    destination = "/tmp/kerberos-server.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/kerberos-server.sh",
+      "/tmp/kerberos-server.sh ${aws_instance.cdh_server.private_ip}",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/../scripts/${var.platform}/csd-spark2.sh",
+      "${path.module}/../scripts/${var.platform}/csd-dsw.sh",
+      "${path.module}/../scripts/${var.platform}/restart-cloudera-manager.sh",
+    ]
+  }
 }
 
 resource "aws_instance" "cdh_node" {
-    ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
-    instance_type = "${var.instance_type}"
-    key_name = "${var.key_name}"
-    count = "${var.cdh_nodes}"
-    security_groups = ["${aws_security_group.cloudera.name}"]
-    placement_group = "${aws_placement_group.cloudera.id}"
+  ami             = "${lookup(var.ami, "${var.region}-${var.platform}")}"
+  instance_type   = "${var.instance_type}"
+  key_name        = "${var.key_name}"
+  count           = "${var.cdh_nodes}"
+  security_groups = ["${aws_security_group.cloudera.name}"]
+  placement_group = "${aws_placement_group.cloudera.id}"
 
-    root_block_device {
-        volume_type = "${var.volume_type}"
-        volume_size = "${var.volume_size}"
-        iops = "${var.iops}"
-    }
+  root_block_device {
+    volume_type = "${var.volume_type}"
+    volume_size = "${var.volume_size}"
+    iops        = "${var.iops}"
+  }
 
-    tags {
-        Name = "${var.tag_name}-cdh-node-${count.index}"
-    }
+  tags {
+    Name = "${var.tag_name}-cdh-node-${count.index}"
+  }
 
-    volume_tags {
-        Name = "${var.tag_name}-cdh-node-${count.index}"
-    }
+  volume_tags {
+    Name = "${var.tag_name}-cdh-node-${count.index}"
+  }
 
-    connection {
-        user = "${lookup(var.user, var.platform)}"
-        private_key = "${file("${var.key_path}")}"
-    }
+  connection {
+    user        = "${lookup(var.user, var.platform)}"
+    private_key = "${file("${var.key_path}")}"
+  }
 
-    provisioner "remote-exec" {
-        scripts = [
-            "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
-            "${path.module}/../scripts/${var.platform}/java.sh",
-        ]
-    }
+  provisioner "remote-exec" {
+    scripts = [
+      "${path.module}/../scripts/${var.platform}/base.sh",
+      "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
+      "${path.module}/../scripts/${var.platform}/java.sh",
+    ]
+  }
 
-    provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/cdh-agent.sh",
-        destination = "/tmp/cdh-agent.sh"
-    }
-    provisioner "remote-exec" {
-        inline = [
-          "chmod +x /tmp/cdh-agent.sh",
-          "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
-        ]
-    }
+  provisioner "file" {
+    source      = "${path.module}/../scripts/${var.platform}/cdh-agent.sh"
+    destination = "/tmp/cdh-agent.sh"
+  }
 
-    provisioner "file" {
-        source = "${path.module}/../scripts/${var.platform}/kerberos-node.sh",
-        destination = "/tmp/kerberos-node.sh"
-    }
-    provisioner "remote-exec" {
-        inline = [
-          "chmod +x /tmp/kerberos-node.sh",
-          "/tmp/kerberos-node.sh ${aws_instance.cdh_server.private_ip}",
-        ]
-    }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/cdh-agent.sh",
+      "/tmp/cdh-agent.sh ${aws_instance.cdh_server.private_ip}",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/../scripts/${var.platform}/kerberos-node.sh"
+    destination = "/tmp/kerberos-node.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/kerberos-node.sh",
+      "/tmp/kerberos-node.sh ${aws_instance.cdh_server.private_ip}",
+    ]
+  }
 }

@@ -20,10 +20,11 @@ module "cloudera" {
     volume_size = "100"
 
     # Instances to be created
+    client = "1"  # 1 or 0
     cdh_server = "1"  # 1 or 0
     cdh_nodes = "3"   # 0 or more
-    dsw_master = "1"  # 1 or 0
-    dsw_nodes = "3"   # 0 or more
+    dsw_master = "0"  # 1 or 0
+    dsw_nodes = "0"   # 0 or more
     ambari_server = "0"  # 1 or 0
     ambari_nodes = "0"   # 0 or more
 }
@@ -113,10 +114,13 @@ After you install CDH:
 For CDH (and DSW) the Kerberos server is installed in the CDH server node and client libraries in the other nodes.
 The `krb5.conf` file is automatically configured to point to the Kerberos server.
 
-Two principals are created:
+Multiple principals are created:
 
+- `cloudera-scm/admin@ANACONDA.COM` - PW: `cloudera-scm`
 - `centos@ANACONDA.COM` - PW: `centos`
-- `cloudera-scm/admin@ANACONDA.COM` - PW: `cloudera`
+- `daniel@ANACONDA.COM` - PW: `daniel`
+- `christine@ANACONDA.COM` - PW: `christine`
+- `kris@ANACONDA.COM` - PW: `kris`
 
 After terraform finishes you can ssh into any node and `kinit` as the `centos` user.
 
@@ -124,7 +128,7 @@ On Cloudera Manager:
 - Security > Enable Kerberos.
   - Follow the Cloudera Manager to finish setting up the CDH cluster with Kerberos.
 - `KDC Server host` and `KDC Admin server host` is the internal ip of the CDH server.
-- Use the `cloudera-scm/admin` principal (pass: `cloudera`) and 
+- Use the `cloudera-scm/admin` principal (pass: `cloudera-scm`) and 
 
 ## Ambari
 

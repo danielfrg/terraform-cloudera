@@ -3,9 +3,6 @@
 set -e
 set -x
 
-# Just to have these pkgs somewhere
-sudo yum install -y unzip tmux bzip2
-
 # Just in case
 sudo yum remove --assumeyes *openjdk*
 
