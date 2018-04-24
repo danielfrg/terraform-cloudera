@@ -6,6 +6,10 @@ variable "key_path" {
   description = "Path to the private key specified by key_name."
 }
 
+variable "hosted_zone_id" {
+  description = "Route 53 Hosted Zone ID"
+}
+
 # Optional
 
 variable "tag_name" {
@@ -74,10 +78,12 @@ variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types"
 
   default = {
-    us-east-1-centos7 = "ami-4bf3d731"
-    us-east-2-centos7 = "ami-e1496384"
-    us-west-1-centos7 = "ami-65e0e305"
-    us-west-2-centos7 = "ami-a042f4d8"
+    us-east-1-centos7 = "ami-b81dbfc5"
+
+    # Need to update those
+    # us-east-2-centos7 = "ami-e1496384"
+    # us-west-1-centos7 = "ami-65e0e305"
+    # us-west-2-centos7 = "ami-a042f4d8"
   }
 }
 

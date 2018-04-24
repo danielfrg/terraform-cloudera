@@ -11,13 +11,16 @@ LIVY_HOME=/home/livy/livy-$LIVY_VERSION-bin
 sudo useradd -m -p $(echo livy | openssl passwd -1 -stdin) livy
 sudo usermod -aG wheel livy  # This only works on centos
 
+sudo su hdfs -c "hadoop dfs -mkdir /user/livy"
+sudo su hdfs -c "hadoop dfs -chown livy:livy /user/livy"
+
 sudo -u livy -i <<EOF
 # echo $LIVY_VERSION
 
-# curl -O http://mirrors.advancedhosters.com/apache/incubator/livy/$LIVY_VERSION/livy-$LIVY_VERSION-bin.zip
-# unzip livy-$LIVY_VERSION-bin.zip
+curl -O http://mirrors.advancedhosters.com/apache/incubator/livy/$LIVY_VERSION/livy-$LIVY_VERSION-bin.zip
+unzip livy-$LIVY_VERSION-bin.zip
 
-# mkdir -p $LIVY_HOME/logs
+mkdir -p $LIVY_HOME/logs
 
 #######################################
 # Conf files

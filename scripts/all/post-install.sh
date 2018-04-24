@@ -10,6 +10,7 @@ set -x
 sudo su hdfs
 kinit hdfs # password: hdfs
 
+# users are created in the base script
 hdfs dfs -mkdir /user/centos/
 hdfs dfs -mkdir /user/daniel/
 hdfs dfs -mkdir /user/christine/

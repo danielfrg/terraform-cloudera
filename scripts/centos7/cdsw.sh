@@ -9,12 +9,16 @@ DSW_DOMAIN=$2
 sudo yum install -y cloudera-data-science-workbench
 
 sudo bash -c 'cat > /etc/cdsw/config/cdsw.conf' << EOF
+# General config
 DOMAIN="?DOMAIN"
 MASTER_IP="?MASTER_IP"
 DOCKER_BLOCK_DEVICES="/dev/xvdb"
 JAVA_HOME="/usr/java/jdk1.8.0_121-cloudera/jre"
+
+# Master only
 APPLICATION_BLOCK_DEVICE="/dev/xvdc"
 
+# Connection
 KUBE_TOKEN=496c1f.040be8cbb0f7dfcc
 EOF
 

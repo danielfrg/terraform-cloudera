@@ -18,11 +18,13 @@ module "cloudera" {
     region = "us-east-1"
     instance_type = "c4.2xlarge"
     volume_size = "100"
+    hosted_zone_id = "Z32CY1LHYK88ZD"
 
     # Instances to be created
     client = "1"  # 1 or 0
     cdh_server = "1"  # 1 or 0
     cdh_nodes = "3"   # 0 or more
+    dsw_domain    = "cdsw.example.com"
     dsw_master = "0"  # 1 or 0
     dsw_nodes = "0"   # 0 or more
     ambari_server = "0"  # 1 or 0
@@ -30,20 +32,12 @@ module "cloudera" {
 }
 
 output "cdh_server_address" {
-    value = "${module.cloudera.cdh_server_address}"
+  value = "${module.cloudera.cdh_server_address}"
 }
 
-output "cdh_server_address" {
-    value = "${aws_instance.cdh_server.0.public_ip}"
+output "dsw_master_address" {
+  value = "${module.cloudera.dsw_master_address}"
 }
-
-# output "dsw_master_address" {
-#     value = "${aws_instance.dsw_master.0.public_ip}"
-# }
-
-# output "ambari_server_address" {
-#     value = "${aws_instance.ambari_server.0.public_ip}"
-# }
 ```
 
 ```
@@ -53,61 +47,43 @@ Outputs:
 
 cdh_server_address = <Public IP address>
 dsw_master_address = <Public IP address>
-ambari_server_address = <Public IP address>
 ```
 
-Navigate to `<Public IP address>:7180` and login (user: `admin`, pass:`admin`).
+## CDH
+
+Navigate to `cdh_server_address:7180` and login (user: `admin`, pass:`admin`).
 
 Follow the multiple prompts and on `Specify hosts for your CDH cluster installation` click on `Currently Managed Hosts (X)`
 and all your nodes should already be connected.
 
 ## DSW
 
-This option will create special nodes for DSW. Basically instances with the correct EBS volumes that are required by DSW:
+**Note:** Before installing DSW do the regular Cloudera Manager install and in the nodes for DSW select the roles:
+- HDFS Gateway
+- YARN Gateway
+- Spark2 Gateway
+
+This option will create special nodes for DSW. Basically create instances with the correct EBS volumes that are required by DSW:
 - 1 master:
   - Docker: `/dev/xvdb`
   - App volume: `/dev/xvdc`
 - 0-X nodes: 2 mounts
   - Docker: `/dev/xvdb`
 
-You need to configure DNS manually to point to the DSW domain.
-
-### Packages
-
 DSW packages are installed in all the DSW nodes.
-Before installing DSW do the regular Cloudera Manager install and in the nodes for DSW select the roles:
-- HDFS Gateway
-- YARN Gateway
-- Spark2 Gateway
 
 Config file `/etc/cdsw/config/cdsw.conf` is configured automatically but you should double-check:
-1. Domain should
+1. FQDN
 2. Private IP address
 3. Paths of mounts for docker and application storage (on the master)
 
-In the master node run `sudo cdsw init`.
+In the master node:
+1. `sudo cdsw init`
 
-In the worker nodes:
-1.  Delete the `APPLICATION_BLOCK_DEVICE` from `/etc/cdsw/config/cdsw.conf`
+In the worker nodes (after master is ready):
+1.  Delete the `Master only` section from `/etc/cdsw/config/cdsw.conf`
 1. `sudo mkdir /var/lib/cdsw`
 1. `sudo cdsw join`
-
-### Parcel
-
-Prerequisites:
-1. Configure `JAVA_HOME` in CDH (Hosts > Configuration > JAVA_HOME) to `/usr/java/jdk1.8.0_121-cloudera/jre`
-
-After terraform finishes go over the Cloudera Manager process and in the role selection 
-use the DSW nodes only as Gateway.
-
-CSD for Spark2 and Cloudera Data Science Workbench but you need to install the services.
-
-After you install CDH:
-1. Install Spark2 service
-2. Install DSW service, you will need:
-    1. Create DNS entries for the master node. `terraform output` will show you this value
-    2. Private IP of master
-    3. Docker volume: `/dev/xvdb`
 
 ## Kerberos
 
@@ -121,6 +97,7 @@ Multiple principals are created:
 - `daniel@ANACONDA.COM` - PW: `daniel`
 - `christine@ANACONDA.COM` - PW: `christine`
 - `kris@ANACONDA.COM` - PW: `kris`
+- `ben@ANACONDA.COM` - PW: `ben`
 
 After terraform finishes you can ssh into any node and `kinit` as the `centos` user.
 

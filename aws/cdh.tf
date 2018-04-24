@@ -31,8 +31,10 @@ resource "aws_instance" "cdh_server" {
       "${path.module}/../scripts/${var.platform}/base.sh",
       "${path.module}/../scripts/${var.platform}/cloudera-repo.sh",
       "${path.module}/../scripts/${var.platform}/java.sh",
-      "${path.module}/../scripts/${var.platform}/livy.sh",
     ]
+
+    # Livy has to be executed as a post-install step
+    # "${path.module}/../scripts/${var.platform}/livy.sh",
   }
 
   provisioner "remote-exec" {
