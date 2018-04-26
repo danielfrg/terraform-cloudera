@@ -18,15 +18,15 @@ module "cloudera" {
     region = "us-east-1"
     instance_type = "c4.2xlarge"
     volume_size = "100"
-    hosted_zone_id = "Z32CY1LHYK88ZD"
+    hosted_zone_id = ""
 
     # Instances to be created
-    client = "1"  # 1 or 0
     cdh_server = "1"  # 1 or 0
     cdh_nodes = "3"   # 0 or more
-    dsw_domain    = "cdsw.example.com"
+    dsw_domain = "cdsw.example.com"
     dsw_master = "0"  # 1 or 0
     dsw_nodes = "0"   # 0 or more
+    client = "1"  # 1 or 0
     ambari_server = "0"  # 1 or 0
     ambari_nodes = "0"   # 0 or more
 }

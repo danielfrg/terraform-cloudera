@@ -1,3 +1,2 @@
 *.tfstate*
 .terraform
-local.tf
